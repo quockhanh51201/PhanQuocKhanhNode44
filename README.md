@@ -1,1 +1,1 @@
-Đây là sql buổi 2
+Đây là nơi nộp bài tập
