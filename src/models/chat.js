@@ -1,42 +1,34 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class food extends Model {
+export default class chat extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    food_id: {
+    id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    food_name: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    image: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
-    description: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    type_id: {
+    user_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'food_type',
-        key: 'type_id'
-      }
+      allowNull: true
+    },
+    content: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    room_id: {
+      type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'food',
+    tableName: 'chat',
     timestamps: false,
     indexes: [
       {
@@ -44,14 +36,7 @@ export default class food extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "food_id" },
-        ]
-      },
-      {
-        name: "type_id",
-        using: "BTREE",
-        fields: [
-          { name: "type_id" },
+          { name: "id" },
         ]
       },
     ]

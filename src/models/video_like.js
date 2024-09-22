@@ -1,10 +1,10 @@
 import _sequelize from 'sequelize';
 const { Model, Sequelize } = _sequelize;
 
-export default class order extends Model {
+export default class video_like extends Model {
   static init(sequelize, DataTypes) {
   return super.init({
-    order_id: {
+    like_id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -18,29 +18,25 @@ export default class order extends Model {
         key: 'user_id'
       }
     },
-    food_id: {
+    video_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'food',
-        key: 'food_id'
+        model: 'video',
+        key: 'video_id'
       }
     },
-    amount: {
-      type: DataTypes.INTEGER,
+    date_create: {
+      type: DataTypes.DATE,
       allowNull: true
     },
-    code: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    arr_sub_id: {
-      type: DataTypes.STRING(255),
+    dis_like: {
+      type: DataTypes.BOOLEAN,
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'order',
+    tableName: 'video_like',
     timestamps: false,
     indexes: [
       {
@@ -48,7 +44,7 @@ export default class order extends Model {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "order_id" },
+          { name: "like_id" },
         ]
       },
       {
@@ -59,10 +55,10 @@ export default class order extends Model {
         ]
       },
       {
-        name: "food_id",
+        name: "video_id",
         using: "BTREE",
         fields: [
-          { name: "food_id" },
+          { name: "video_id" },
         ]
       },
     ]

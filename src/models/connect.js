@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize'
 
 const sequelize = new Sequelize(
-    'node44',// tên db
+    'ytb_node44',// tên db
     'root',//username
     '123456',//pass
     {
