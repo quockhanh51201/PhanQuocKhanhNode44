@@ -1,14 +1,14 @@
 import { Sequelize } from 'sequelize'
-
+import configDB from '../config/connect_db.js'
 const sequelize = new Sequelize(
-    'ytb_node44',// tên db
-    'root',//username
-    '123456',//pass
+    configDB.database,// tên db
+    configDB.user,//username
+    configDB.pass,//pass
     {
-        host: 'localhost',
-        port: 3306,
-        dialect: 'mysql'
+        host: configDB.host,
+        port: configDB.port,
+        dialect: configDB.dialect
     }
 )
 
-export default sequelize
+export default sequelize 
