@@ -1,5 +1,13 @@
 import express from 'express'
-import { login, register, loginFace, extendToken, loginAsyncKey } from '../controllers/auth.controller.js'
+import {
+    login,
+    register,
+    loginFace,
+    extendToken,
+    loginAsyncKey,
+    forgotPass,
+    changePassword
+} from '../controllers/auth.controller.js'
 
 const authRouter = express.Router()
 
@@ -9,5 +17,7 @@ authRouter.post("/login", login) // login bang khoa doi xung
 authRouter.post("/login-face", loginFace)
 authRouter.post("/extend-token", extendToken)
 authRouter.post("/login-async-key", loginAsyncKey) // login bang khoa bat doi xung
+authRouter.post("/forgot-password", forgotPass)
+authRouter.post("/change-password", changePassword)
 
 export default authRouter

@@ -3,9 +3,10 @@ import { INTERNAL_SERVER, OK } from "../../const.js";
 import initModels from "../models/init-models.js";
 import sequelize from "../models/connect.js";
 import { Op } from 'sequelize'; // operator: toán tử: LIKE, AND, IN, OR
+import { PrismaClient } from "@prisma/client";
 
 const model = initModels(sequelize)
-
+const prisma = new PrismaClient();
 const createUser = async (req, res) => {
     //lấy data từ body của req
     try {
@@ -96,6 +97,38 @@ const updateUser = async (req, res) => {
         return res.status(INTERNAL_SERVER).json({ messgae: "error" });
     }
 }
+const uploadAvatar = async (req, res) => {
+    try {
+        let file = req.file;
+        console.log("get req: ", req.body.userId);
+        let userId = req.body.userId;
+        let user = await prisma.users.findFirst({
+            where: { user_id: Number(userId) }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        // update column avatar trong table users
+        let avatarPath = `/public/imgs/${file.filename}`
+        await prisma.users.update({
+            data: {
+                avatar: avatarPath
+            },
+            where: {
+                user_id: Number(userId) // phải ép kiểu về đúng datatype của column
+            }
+        })
+        return res.status(200).json({
+            data: avatarPath,
+            message: "Upload avatar successfully"
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: "error api upload avatar" });
+    }
+}
 export {
-    createUser, getUser, deleteUser, updateUser
+    createUser, getUser, deleteUser, updateUser, uploadAvatar
 }

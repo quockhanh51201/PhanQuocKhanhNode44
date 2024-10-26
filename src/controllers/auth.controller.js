@@ -5,6 +5,7 @@ import { Op } from 'sequelize'; // operator: toán tử: LIKE, AND, IN, OR
 import bcrypt, { compareSync } from 'bcrypt'
 import transporter from "../config/transporter.js";
 import { createRefAsyncToken, createRefToken, createToken, createTokenAsyncKey } from "../config/jwt.js";
+import crypto from 'crypto'
 
 const model = initModels(sequelize)
 const register = async (req, res, next) => {
@@ -183,8 +184,80 @@ const loginAsyncKey = async (req, res) => {
             data: { accessToken }
         });
     } catch (error) {
-        return res.status(INTERNAL_SERVER).json({ message: "error" });
+        return res.status(INTERNAL_SERVER).json({ message: "error API forgot password" });
     }
 }
 
-export { register, login, loginFace, extendToken, loginAsyncKey }
+const forgotPass = async (req, res) => {
+    try {
+        let { email } = req.body
+        let checkEmail = await model.users.findOne({
+            where: {
+                email
+            }
+        })
+        if (!checkEmail) {
+            return res.status(400).json({ message: "Email is wrong" })
+        }
+        let randomCode = crypto.randomBytes(5).toString("hex")
+        //tạo biến luuw expired code 
+        let expired = new Date(new Date().getTime() + 1 * 60 * 60 * 1000)
+        //lưu code vào db 
+        await model.code.create({
+            code: randomCode,
+            expired: expired
+        })
+        // send email 
+        const mailOption = {
+            from: 'quockhanh51201@gmail.com',
+            to: email,
+            subject: "Mã xác thực",
+            text: `Hệ thống gửi bạn mã code forgot password`,
+            html: `<h1>${randomCode}</h1>`
+        }
+        transporter.sendMail(mailOption, (err, info) => {
+            if (err) {
+                return res.status(500).json({ message: "Sending email error" });
+            }
+            return res.status(200).json({
+                message: "Please check your email",
+            });
+        })
+    } catch (error) {
+        return res.status(INTERNAL_SERVER).json({ message: "error" });
+    }
+}
+const changePassword = async (req, res) => {
+    try {
+        let { email, code, newPass } = req.body
+        let checkCode = await model.code.findOne({
+            where: {
+                code
+            }
+        })
+        if (!checkCode) {
+            return res.status(400).json({ message: "Code is wrong" })
+        }
+        // check code xem có còn exprire không
+        let checkEmail = await model.users.findOne({
+            where: {
+                email
+            }
+        })
+        if (!checkEmail) {
+            return res.status(400).json({ message: "Email is wrong" })
+        }
+        let hashNewPass = bcrypt.hashSync(newPass, 10)
+        checkEmail.pass_word = hashNewPass
+        checkEmail.save()
+
+        //remove code sau khi change password
+        await model.code.destroy({
+            where: { code }
+        })
+        return res.status(OK).json({ message: 'change password successfully' })
+    } catch (error) {
+        return res.status(INTERNAL_SERVER).json({ message: "error" });
+    }
+}
+export { register, login, loginFace, extendToken, loginAsyncKey, forgotPass, changePassword }

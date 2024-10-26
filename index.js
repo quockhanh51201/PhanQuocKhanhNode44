@@ -3,9 +3,35 @@ import { OK, INTERNAL_SERVER } from './const.js'
 import rootRoutes from './src/routers/root.router.js'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { Server } from 'socket.io'
+import { createServer } from 'http'
 
 const app = express()
 
+//tạo http server
+const server = createServer(app);
+
+// tạo socketIO server
+//io: object của socket sẻver
+// socket: objext của socket client 
+const io = new Server(server, {
+    cors: {
+        origin: "*"
+    }
+})
+
+// lắng nghe event kết nối từ client (FE) qua socketIO
+//on: nhận event
+//emit: gửi even
+// on và emit có 2 params: 
+//      - event type: event của socketIO hoặc event của user tự define,
+//      - function
+io.on('connection', (socket) => {
+    console.log(socket.id)
+})
+
+// define middleware để public folder public
+app.use(express.static("."));
 
 // midleware để đọc data json
 app.use(express.json())
